@@ -130,7 +130,7 @@ def run_baidu_synonym_mining(input_path, output_path):
         # matched_results.append([name, matched_name, is_equal, label])
         fout.writelines('\t'.join([str(name), str(matched_name), str(is_equal), str(label)]))
         fout.flush()
-        time.sleep(3)
+        time.sleep(2)
 
     # save_file(matched_results, output_path, columns=['jbs_ori_name', 'jbs_matched_name', 'is_equal_name', 'in_standard_corpus'])
 
