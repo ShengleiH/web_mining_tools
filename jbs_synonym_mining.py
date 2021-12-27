@@ -118,7 +118,7 @@ def run_baidu_synonym_mining(input_path, output_path):
     fout.writelines('\t'.join(['jbs_ori_name', 'jbs_matched_name', 'is_equal_name', 'in_standard_corpus']) + '\n')
     fout.flush()
 
-    for name, label in tqdm(data):
+    for name, _, label in tqdm(data):
         # if len(proxy_list) == 0:
         #     update_ip_list()
         try:
