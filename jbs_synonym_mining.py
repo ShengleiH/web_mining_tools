@@ -136,6 +136,6 @@ def run_baidu_synonym_mining(input_path, output_path):
 
 if __name__ == '__main__':
     run_baidu_synonym_mining(
-        "data/jbs_names.txt",
+        "data/剧本名_cleaned.xlsx",
         "data/jbs_synonym_names.txt"
     )
