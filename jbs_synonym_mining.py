@@ -59,22 +59,14 @@ def save_file(data, path, columns):
 
 
 def synonym_from_baidu(query):
-    url = f'https://www.baidu.com/s?wd={query}'
+    url = f'https://www.baidu.com/s?wd={query}%20剧本杀'
     headers = {
         "Accept-Encoding": "gzip, deflate, br",
         "Accept-Language": "zh-CN,zh;q=0.9",
-        "Cache-Control": "no-cache",
-        "Connection": "Upgrade",
-        "Host": "cstm.baidu.com",
-        "Origin": "https://www.baidu.com",
-        "Pragma": "no-cache",
-        "Sec-WebSocket-Extensions": "permessage-deflate; client_max_window_bits",
-        "Sec-WebSocket-Key": "S1Q/CwNj7v/zryFCx1ejww==",
-        "Sec-WebSocket-Version": "13",
-        "Upgrade": "websocket",
         "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36"
     }
     html = requests.get(url, headers=headers, timeout=20).text
+    # print(html)
     soup = BeautifulSoup(html, "html.parser")
     contents = soup.find_all(id='content_left')[0].contents
     max_baidu_cnt = 3
@@ -84,7 +76,8 @@ def synonym_from_baidu(query):
     for idx, cont in enumerate(contents):
         if isinstance(cont, NavigableString):
             continue
-        div_contents = cont.contents
+        # div_contents = cont.contents
+        div_contents = soup.findAll(name="h3", attrs={"class": "t"})
         stoped = False
         for div in div_contents:
             if isinstance(div, NavigableString):
@@ -96,7 +89,7 @@ def synonym_from_baidu(query):
             collected_h3.append(div.text)
         if stoped:
             break
-
+    # print(collected_h3)
     matched_names = []
     for h3 in collected_h3:
         if '剧本杀' not in h3:
@@ -104,7 +97,7 @@ def synonym_from_baidu(query):
         h3_name = re.findall(attr_pattern, h3)
         if len(h3_name) > 0:
             matched_names.extend(h3_name)
-
+    # print(collected_h3, matched_names)
     matched_name = ''
     if len(matched_names) > 0:
         matched_name = Counter(matched_names).most_common()[0][0]
@@ -128,7 +121,7 @@ def run_baidu_synonym_mining(input_path, output_path):
             # update_ip_list()
         is_equal = int(name == matched_name)
         # matched_results.append([name, matched_name, is_equal, label])
-        fout.writelines('\t'.join([str(name), str(matched_name), str(is_equal), str(label)]))
+        fout.writelines('\t'.join([str(name), str(matched_name), str(is_equal), str(label)]) + '\n')
         fout.flush()
         time.sleep(2)
 
