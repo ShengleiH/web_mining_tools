@@ -11,6 +11,7 @@ sys.path.append(father_path)
 import time
 import pandas as pd
 import numpy as np
+import random
 
 
 def read_file(path, fillna=""):
@@ -58,14 +59,30 @@ def save_file(data, path, columns):
     print("Finish saving {} data to file {}".format(len(data), path))
 
 
+proxy_list = set()
+def update_ip_list():
+    urlip = 'http://proxy.httpdaili.com/apinew.asp?sl=20&noinfo=true&text=1&ddbh=2287705608927186447'
+    ip_list = [ip for ip in requests.get(urlip).text.split('\r\n')]
+    proxy_list.clear()
+    for ip in ip_list:
+        if len(ip.strip()) > 0:
+            # proxy_list.add('http://' + ip)
+            proxy_list.add(ip)
+
+def get_random_ip():
+    proxy_ip = random.choice(list(proxy_list))
+    proxies = {'https': proxy_ip}
+    return proxies
+
+
 def synonym_from_baidu(query):
     url = f'https://www.baidu.com/s?wd={query}%20剧本杀'
-    headers = {
-        "Accept-Language": "zh-CN,zh;q=0.9",
-        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36"
-    }
-    html = requests.get(url, headers=headers, timeout=20).text
-    # print(html)
+    # headers = {
+    #     "Accept-Language": "zh-CN,zh;q=0.9",
+    #     "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36"
+    # }
+    # html = requests.get(url, headers=headers, timeout=20).text
+    html = requests.get(url, proxies=get_random_ip(), timeout=20).text
     soup = BeautifulSoup(html, "html.parser")
     contents = soup.find_all(id='content_left')[0].contents
     max_baidu_cnt = 3
@@ -111,13 +128,13 @@ def run_baidu_synonym_mining(input_path, output_path):
     fout.flush()
 
     for name, _, label in tqdm(data):
-        # if len(proxy_list) == 0:
-        #     update_ip_list()
+        if len(proxy_list) == 0:
+            update_ip_list()
         try:
             matched_name = synonym_from_baidu(name)
         except:
             matched_name = 'ERROR'
-            # update_ip_list()
+            update_ip_list()
         is_equal = int(name == matched_name)
         # matched_results.append([name, matched_name, is_equal, label])
         fout.writelines('\t'.join([str(name), str(matched_name), str(is_equal), str(label)]) + '\n')
