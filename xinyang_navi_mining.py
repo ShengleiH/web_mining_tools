@@ -58,19 +58,19 @@ def parse_item_html(path, out_path):
         level_2_navi_names = [b.text.strip() for b in level_2_navi_blocks]
 
         product_boxes = big_navi_block.findAll(name="div", attrs={"class": "product-box"})
-        print(product_boxes)
+        # print(product_boxes)
         processed_product_boxes = []
         for product_box in product_boxes:
             processed_products = []
             products = product_box.findAll(name="div", attrs={"class": "product"})
-            print("products cnt:", len(products))
+            # print("products cnt:", len(products))
             for product in products:
                 prod_url = product.attrs["data-url"]
                 product_title = product.findAll(name="div", attrs={"class": "product-title"})[0].text.strip().split("\n")[0].strip()
                 product_des = product.findAll(name="p", attrs={"class": "product-des"})[0].text.strip()
                 processed_products.append(
                     {
-                        "prod_url": prod_url,
+                        "prod_url": "https:" + prod_url,
                         "product_title": product_title,
                         "product_des": product_des
                     }
@@ -121,8 +121,8 @@ def parse_other_html(path, out_path):
 
 
 if __name__ == '__main__':
-    navi_from_xinyang()
+    # navi_from_xinyang()
     # parse_item_html("data/yimei_navi/index.html", "data/yimei_navi_processed/item.xlsx")
     # parse_other_html("data/yimei_navi/drug.html", "data/yimei_navi_processed/drug.xlsx")
-    # parse_other_html("data/yimei_navi/instrument.html", "data/yimei_navi_processed/instrument.xlsx")
+    parse_other_html("data/yimei_navi/instrument.html", "data/yimei_navi_processed/instrument.xlsx")
     # parse_other_html("data/yimei_navi/material.html", "data/yimei_navi_processed/material.xlsx")
